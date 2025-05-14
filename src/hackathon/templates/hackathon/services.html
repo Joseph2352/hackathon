@@ -1,0 +1,55 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6" data-aos="fade-up">Nos Services</h1>
+        <p class="text-xl max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Découvrez notre gamme complète de services professionnels, conçus pour vous accompagner dans votre transformation digitale.
+        </p>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Service 1 -->
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Conseil Stratégique</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Notre équipe vous accompagne dans l'élaboration de votre stratégie digitale, afin de vous aider à atteindre vos objectifs et à vous démarquer sur le marché.
+                </p>
+                <a href="{% url 'contact' %}" class="inline-block bg-primary-600 text-white px-6 py-2 rounded font-semibold hover:bg-primary-700 transition duration-300">En savoir plus</a>
+            </div>
+            <!-- Service 2 -->
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Développement Sur Mesure</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Nous concevons et développons des solutions informatiques (sites web, applications, logiciels) adaptées à vos besoins et à votre image de marque.
+                </p>
+                <a href="{% url 'contact' %}" class="inline-block bg-primary-600 text-white px-6 py-2 rounded font-semibold hover:bg-primary-700 transition duration-300">En savoir plus</a>
+            </div>
+            <!-- Service 3 -->
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="300">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Formation & Coaching</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Nous proposons des formations et un coaching personnalisé pour vous aider à maîtriser les outils digitaux et à optimiser vos processus internes.
+                </p>
+                <a href="{% url 'contact' %}" class="inline-block bg-primary-600 text-white px-6 py-2 rounded font-semibold hover:bg-primary-700 transition duration-300">En savoir plus</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-primary-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <h2 class="text-3xl font-bold mb-4">Prêt à vous lancer ?</h2>
+        <p class="text-xl mb-8">Contactez-nous dès aujourd'hui pour discuter de votre projet et découvrir comment nos services peuvent vous accompagner.</p>
+        <a href="{% url 'contact' %}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">Contactez-nous</a>
+    </div>
+</section>
+{% endblock %} 

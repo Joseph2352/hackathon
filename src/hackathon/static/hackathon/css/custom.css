@@ -1,0 +1,248 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3b82f6;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #2563eb;
+}
+
+/* Smooth Transitions */
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Custom Focus Styles */
+.focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+}
+
+/* Custom Container Padding */
+.container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+}
+
+/* Custom Section Spacing */
+.section-spacing {
+    @apply py-12 md:py-20;
+}
+
+/* Custom Card Styles */
+.card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6;
+}
+
+.card-hover {
+    @apply transition-transform duration-300 hover:transform hover:scale-105;
+}
+
+/* Custom Button Styles */
+.btn-primary {
+    @apply bg-primary-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-primary-700 transition-colors duration-300;
+}
+
+.btn-secondary {
+    @apply bg-gray-200 text-gray-800 px-6 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors duration-300;
+}
+
+/* Custom Text Styles */
+.text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-primary-800;
+}
+
+/* Custom Image Styles */
+.img-hover {
+    @apply transition-transform duration-300 hover:transform hover:scale-105;
+}
+
+/* Custom Form Styles */
+.form-input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+}
+
+/* Custom Grid Layouts */
+.grid-auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Custom Responsive Typography */
+.responsive-heading {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+}
+
+.responsive-text {
+    @apply text-base md:text-lg lg:text-xl;
+}
+
+/* Custom Dark Mode Transitions */
+.dark-mode-transition {
+    @apply transition-colors duration-300;
+}
+
+/* Custom Loading States */
+.loading {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+}
+
+/* Custom Error States */
+.error-state {
+    @apply text-red-600 dark:text-red-400;
+}
+
+/* Custom Success States */
+.success-state {
+    @apply text-green-600 dark:text-green-400;
+}
+
+/* Custom Link Styles */
+.link-primary {
+    @apply text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300;
+}
+
+/* Custom Badge Styles */
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+
+.badge-primary {
+    @apply bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-300;
+}
+
+/* Custom Divider */
+.divider {
+    @apply border-t border-gray-200 dark:border-gray-700 my-8;
+}
+
+/* Custom List Styles */
+.list-custom {
+    @apply space-y-2;
+}
+
+.list-item-custom {
+    @apply flex items-center space-x-2;
+}
+
+/* Custom Icon Styles */
+.icon-custom {
+    @apply w-6 h-6 text-primary-600 dark:text-primary-400;
+}
+
+/* Custom Navigation Styles */
+.nav-link {
+    @apply text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 transition-colors duration-300;
+}
+
+.nav-link-active {
+    @apply text-primary-600 dark:text-primary-400 font-semibold;
+}
+
+/* Custom Footer Styles */
+.footer-link {
+    @apply text-gray-400 hover:text-white transition-colors duration-300;
+}
+
+/* Custom Social Media Icons */
+.social-icon {
+    @apply w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-primary-600 hover:text-white transition-colors duration-300;
+}
+
+/* Custom Back to Top Button */
+.back-to-top {
+    @apply fixed bottom-8 right-8 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-all duration-300;
+}
+
+/* Custom Mobile Menu */
+.mobile-menu {
+    @apply fixed inset-0 bg-white dark:bg-gray-800 z-50 transform transition-transform duration-300;
+}
+
+.mobile-menu-hidden {
+    @apply -translate-x-full;
+}
+
+.mobile-menu-visible {
+    @apply translate-x-0;
+}
+
+/* Custom Modal */
+.modal {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+    @apply bg-white dark:bg-gray-800 rounded-lg p-6 max-w-lg w-full mx-4;
+}
+
+/* Custom Tooltip */
+.tooltip {
+    @apply relative inline-block;
+}
+
+.tooltip-text {
+    @apply invisible absolute z-10 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg opacity-0 transition-opacity duration-300;
+}
+
+.tooltip:hover .tooltip-text {
+    @apply visible opacity-100;
+}
+
+/* Custom Progress Bar */
+.progress-bar {
+    @apply w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5;
+}
+
+.progress-bar-fill {
+    @apply bg-primary-600 h-2.5 rounded-full transition-all duration-300;
+}
+
+/* Custom Alert Styles */
+.alert {
+    @apply p-4 rounded-lg mb-4;
+}
+
+.alert-success {
+    @apply bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300;
+}
+
+.alert-error {
+    @apply bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300;
+}
+
+.alert-warning {
+    @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300;
+}
+
+.alert-info {
+    @apply bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300;
+} 

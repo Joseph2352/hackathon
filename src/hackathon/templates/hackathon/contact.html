@@ -1,0 +1,255 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6" data-aos="fade-up">Contactez-nous</h1>
+        <p class="text-xl max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Nous sommes là pour répondre à toutes vos questions et vous accompagner dans vos projets.
+        </p>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Contact Form -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8" data-aos="fade-right">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Envoyez-nous un message</h2>
+                
+                <form method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Name -->
+                    <div>
+                        <label for="name" class="form-label">Nom complet</label>
+                        <input type="text" id="name" name="name" required
+                            class="form-input focus-ring"
+                            placeholder="Votre nom">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" id="email" name="email" required
+                            class="form-input focus-ring"
+                            placeholder="votre@email.com">
+                    </div>
+
+                    <!-- Subject -->
+                    <div>
+                        <label for="subject" class="form-label">Sujet</label>
+                        <select id="subject" name="subject" required class="form-input focus-ring">
+                            <option value="">Sélectionnez un sujet</option>
+                            <option value="general">Question générale</option>
+                            <option value="service">Demande de service</option>
+                            <option value="support">Support technique</option>
+                            <option value="other">Autre</option>
+                        </select>
+                    </div>
+
+                    <!-- Message -->
+                    <div>
+                        <label for="message" class="form-label">Message</label>
+                        <textarea id="message" name="message" rows="6" required
+                            class="form-input focus-ring"
+                            placeholder="Votre message..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" 
+                        class="w-full btn-primary focus-ring">
+                        Envoyer le message
+                    </button>
+                </form>
+            </div>
+
+            <!-- Contact Info & Map -->
+            <div class="space-y-8" data-aos="fade-left">
+                <!-- Contact Information -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Nos coordonnées</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Address -->
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-map-marker-alt text-primary-600 dark:text-primary-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Adresse</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    123 Rue de l'Innovation<br>
+                                    75000 Paris, France
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Phone -->
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-phone text-primary-600 dark:text-primary-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Téléphone</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    <a href="tel:+33123456789" class="hover:text-primary-600 dark:hover:text-primary-400">
+                                        +33 1 23 45 67 89
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-envelope text-primary-600 dark:text-primary-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Email</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    <a href="mailto:contact@example.com" class="hover:text-primary-600 dark:hover:text-primary-400">
+                                        contact@example.com
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Hours -->
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-clock text-primary-600 dark:text-primary-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">Horaires</h3>
+                                <p class="text-gray-600 dark:text-gray-300">
+                                    Lundi - Vendredi: 9h00 - 18h00<br>
+                                    Samedi: 10h00 - 14h00<br>
+                                    Dimanche: Fermé
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div class="mt-8">
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-4">Suivez-nous</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="social-icon" aria-label="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="social-icon" aria-label="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2624.9916256937595!2d2.292292615509614!3d48.85837007928757!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e66e2964e34e2d%3A0x8ddca9ee380ef7e0!2sTour%20Eiffel!5e0!3m2!1sfr!2sfr!4v1647874587234!5m2!1sfr!2sfr"
+                        width="100%" 
+                        height="300" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        class="w-full h-[300px]">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-20 bg-white dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Questions fréquentes</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Trouvez rapidement des réponses à vos questions</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- FAQ Item 1 -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6" data-aos="fade-up" data-aos-delay="100">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    Comment puis-je prendre rendez-vous ?
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Vous pouvez prendre rendez-vous en nous contactant par téléphone, email ou en utilisant notre formulaire de contact ci-dessus.
+                </p>
+            </div>
+
+            <!-- FAQ Item 2 -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6" data-aos="fade-up" data-aos-delay="200">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    Quels sont vos délais de réponse ?
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Nous nous efforçons de répondre à toutes les demandes dans un délai de 24 heures ouvrables.
+                </p>
+            </div>
+
+            <!-- FAQ Item 3 -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6" data-aos="fade-up" data-aos-delay="300">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    Proposez-vous des services d'urgence ?
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Oui, nous proposons des services d'urgence pour nos clients existants. Contactez-nous directement par téléphone.
+                </p>
+            </div>
+
+            <!-- FAQ Item 4 -->
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6" data-aos="fade-up" data-aos-delay="400">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">
+                    Quelles sont vos zones d'intervention ?
+                </h3>
+                <p class="text-gray-600 dark:text-gray-300">
+                    Nous intervenons principalement dans la région parisienne, mais nous pouvons nous déplacer dans toute la France selon vos besoins.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic form validation
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        if (!name || !email || !subject || !message) {
+            alert('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('Veuillez entrer une adresse email valide');
+            return;
+        }
+
+        // If validation passes, submit the form
+        this.submit();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,158 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+{% block content %}
+<!-- Section Posts Populaires -->
+<section class="py-12 bg-gray-100 dark:bg-gray-900">
+  <div class="max-w-2xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center text-primary-700 dark:text-primary-400 mb-8">Signalements urbains populaires</h2>
+    <div class="space-y-8">
+      {% for post in posts %}
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col gap-4">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-12 h-12 rounded-full bg-primary-200 flex items-center justify-center text-xl font-bold text-primary-700 dark:bg-primary-700 dark:text-primary-200">
+            {{ post.user.username|slice:':1'|upper }}
+          </div>
+          <div>
+            <div class="font-semibold text-gray-900 dark:text-white">{{ post.user.username }}</div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">{{ post.created_at|date:'d M Y H:i' }}</div>
+          </div>
+          <span class="ml-auto px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+            {{ post.get_category_display }}
+          </span>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-primary-700 dark:text-primary-400 mb-2">{{ post.title }}</h3>
+          <p class="text-gray-700 dark:text-gray-200 mb-2">{{ post.description }}</p>
+          {% if post.image %}
+          <img src="{{ post.image.url }}" alt="Image du post" class="w-full max-h-96 object-cover rounded-lg border mb-2">
+          {% endif %}
+        </div>
+        <div class="flex items-center gap-4 mt-2">
+          <span class="inline-flex items-center px-3 py-1 bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 rounded-full font-semibold text-sm">
+            <i class="fas fa-thumbs-up mr-2"></i>{{ post.nb_votes }} votes
+          </span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold {% if post.status == 'attente' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200{% elif post.status == 'encours' %}bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200{% else %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200{% endif %}">
+            {{ post.get_status_display }}
+          </span>
+          <span class="text-xs text-gray-500 dark:text-gray-400">Dernière maj : {{ post.updated_at|date:'d M Y H:i' }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div class="text-center text-gray-500 dark:text-gray-400">Aucun signalement pour le moment.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Hero Section -->
+<section class="relative bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <h1 class="text-4xl md:text-5xl font-bold mb-6">Les posts</h1>
+                <p class="text-xl mb-8">Nous offrons des solutions innovantes pour répondre à vos besoins professionnels.</p>
+                <a href="{% url 'contact' %}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+                    Contactez-nous
+                </a>
+            </div>
+            <div data-aos="fade-left" class="hidden md:block">
+                <img src="{% static 'images/hero-image.png' %}" alt="Hero Image" class="rounded-lg shadow-xl">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Nos Services</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Découvrez notre gamme de services professionnels</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Service 1 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="100">
+                <div class="text-primary-600 dark:text-primary-400 mb-4">
+                    <i class="fas fa-chart-line text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Analyse Stratégique</h3>
+                <p class="text-gray-600 dark:text-gray-300">Nous vous aidons à développer des stratégies efficaces pour votre croissance.</p>
+            </div>
+
+            <!-- Service 2 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="200">
+                <div class="text-primary-600 dark:text-primary-400 mb-4">
+                    <i class="fas fa-users text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Consultation</h3>
+                <p class="text-gray-600 dark:text-gray-300">Notre équipe d'experts vous accompagne dans vos projets.</p>
+            </div>
+
+            <!-- Service 3 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg" data-aos="fade-up" data-aos-delay="300">
+                <div class="text-primary-600 dark:text-primary-400 mb-4">
+                    <i class="fas fa-cogs text-4xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Solutions Sur Mesure</h3>
+                <p class="text-gray-600 dark:text-gray-300">Des solutions adaptées à vos besoins spécifiques.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Ce que disent nos clients</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Découvrez les témoignages de nos clients satisfaits</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center mb-4">
+                    <div class="text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">"Une équipe professionnelle qui a su répondre à tous nos besoins. Je recommande vivement leurs services."</p>
+                <div class="font-semibold text-gray-900 dark:text-white">Jean Dupont</div>
+                <div class="text-gray-500 dark:text-gray-400">CEO, Entreprise ABC</div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-center mb-4">
+                    <div class="text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">"Des solutions innovantes et un accompagnement de qualité. Un partenaire de confiance."</p>
+                <div class="font-semibold text-gray-900 dark:text-white">Marie Martin</div>
+                <div class="text-gray-500 dark:text-gray-400">Directrice, Société XYZ</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-primary-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <h2 class="text-3xl font-bold mb-4">Prêt à commencer votre projet ?</h2>
+        <p class="text-xl mb-8">Contactez-nous dès aujourd'hui pour discuter de vos besoins</p>
+        <a href="{% url 'contact' %}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+            Contactez-nous
+        </a>
+    </div>
+</section>
+{% endblock %} 

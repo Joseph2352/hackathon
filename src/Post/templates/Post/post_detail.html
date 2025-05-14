@@ -1,0 +1,19 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Détail du post{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Détail du post</h1>
+    <div class="mt-4">
+        <h2 class="text-xl font-bold text-gray-900 dark:text-white">{{ post.title }}</h2>
+        <p class="text-gray-600 dark:text-gray-400">{{ post.description }}</p>
+        <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-auto rounded-lg">
+        <p class="text-gray-600 dark:text-gray-400">Latitude: {{ post.latitude }}</p>
+        <p class="text-gray-600 dark:text-gray-400">Longitude: {{ post.longitude }}</p>
+        <p class="text-gray-600 dark:text-gray-400">Nombre de votes: {{ post.nb_votes }}</p>
+        <a href="{% url 'post_vote' post.id %}" class="btn btn-primary">Voter</a>
+    </div>
+</div>
+{% endblock %}

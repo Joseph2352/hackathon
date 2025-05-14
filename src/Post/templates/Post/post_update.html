@@ -1,0 +1,15 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Mise à jour du post{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mise à jour du post</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+    </form>
+</div>
+{% endblock %}

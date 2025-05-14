@@ -1,0 +1,41 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Ajout de post{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Ajout de post</h1>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" id="id_latitude" name="latitude">
+        <input type="hidden" id="id_longitude" name="longitude">
+        <button type="submit">Publier</button>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        var lat = document.getElementById('id_latitude').value;
+        var lng = document.getElementById('id_longitude').value;
+        if (!lat || !lng) {
+            e.preventDefault();
+            alert("La géolocalisation est obligatoire pour publier un post.");
+        }
+    });
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById('id_latitude').value = position.coords.latitude;
+            document.getElementById('id_longitude').value = position.coords.longitude;
+        }, function(error) {
+            alert("Impossible de récupérer votre position.");
+        });
+    } else {
+        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+    }
+});
+</script>
+{% endblock %}

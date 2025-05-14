@@ -1,0 +1,28 @@
+{% extends 'hackathon/base.html' %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-center text-primary-700 dark:text-primary-400 mb-6">Carte des signalements urbains</h1>
+  <div id="map" style="height: 500px; border-radius: 16px; overflow: hidden;"></div>
+</div>
+
+<!-- Leaflet.js -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var map = L.map('map').setView([9.6412, -13.5784], 7); // Centré sur la Guinée
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  {% for post in posts %}
+    L.marker([{{ post.latitude }}, {{ post.longitude }}]).addTo(map)
+      .bindPopup(
+        `<b>{{ post.title|escapejs }}</b><br>{{ post.get_category_display }}<br>{{ post.description|escapejs }}<br>` +
+        `{% if post.image %}<img src='{{ post.image.url }}' style='max-width:150px;max-height:100px;border-radius:8px;margin-top:4px;'><br>{% endif %}` +
+        `<span style='font-size:12px;color:#888;'>Votes : {{ post.nb_votes }} | Statut : {{ post.get_status_display }}</span>`
+      );
+  {% endfor %}
+});
+</script>
+{% endblock %} 

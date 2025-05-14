@@ -1,0 +1,79 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6" data-aos="fade-up">À propos de nous</h1>
+        <p class="text-xl max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+            Découvrez notre histoire, nos valeurs et l'équipe qui fait notre force.
+        </p>
+    </div>
+</section>
+
+<!-- Histoire Section -->
+<section class="py-20 bg-white dark:bg-gray-900">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-12" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Notre histoire</h2>
+            <p class="text-lg text-gray-600 dark:text-gray-300">
+                Fondée en 2020, notre entreprise s'est donnée pour mission d'accompagner les professionnels dans leur transformation digitale. Grâce à une équipe passionnée et à l'écoute, nous avons su bâtir une relation de confiance avec nos clients et partenaires.
+            </p>
+        </div>
+        <div class="mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Nos valeurs</h2>
+            <ul class="list-disc list-inside text-lg text-gray-600 dark:text-gray-300 space-y-2">
+                <li>Innovation et créativité</li>
+                <li>Transparence et confiance</li>
+                <li>Excellence et professionnalisme</li>
+                <li>Respect de l'humain et de l'environnement</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Équipe Section -->
+<section class="py-20 bg-gray-50 dark:bg-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Notre équipe</h2>
+            <p class="text-xl text-gray-600 dark:text-gray-300">Des experts passionnés à votre service</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Membre 1 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg text-center" data-aos="fade-up" data-aos-delay="100">
+                <img src="{% static 'images/team1.jpg' %}" alt="Nom Prénom" class="w-24 h-24 mx-auto rounded-full mb-4 shadow-md">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Jean Dupont</h3>
+                <p class="text-primary-600 dark:text-primary-400 font-medium mb-2">Fondateur & CEO</p>
+                <p class="text-gray-600 dark:text-gray-300">Expert en stratégie digitale et passionné par l'innovation.</p>
+            </div>
+            <!-- Membre 2 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg text-center" data-aos="fade-up" data-aos-delay="200">
+                <img src="{% static 'images/team2.jpg' %}" alt="Nom Prénom" class="w-24 h-24 mx-auto rounded-full mb-4 shadow-md">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Marie Martin</h3>
+                <p class="text-primary-600 dark:text-primary-400 font-medium mb-2">Directrice des opérations</p>
+                <p class="text-gray-600 dark:text-gray-300">Spécialiste de la gestion de projet et de la relation client.</p>
+            </div>
+            <!-- Membre 3 -->
+            <div class="bg-white dark:bg-gray-700 rounded-lg p-8 shadow-lg text-center" data-aos="fade-up" data-aos-delay="300">
+                <img src="{% static 'images/team3.jpg' %}" alt="Nom Prénom" class="w-24 h-24 mx-auto rounded-full mb-4 shadow-md">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Ali Ben Youssef</h3>
+                <p class="text-primary-600 dark:text-primary-400 font-medium mb-2">Responsable technique</p>
+                <p class="text-gray-600 dark:text-gray-300">Développeur full-stack et expert en solutions sur mesure.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-20 bg-primary-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-aos="fade-up">
+        <h2 class="text-3xl font-bold mb-4">Envie d'en savoir plus ?</h2>
+        <p class="text-xl mb-8">Contactez-nous pour découvrir comment nous pouvons vous accompagner.</p>
+        <a href="{% url 'contact' %}" class="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-300">
+            Contactez-nous
+        </a>
+    </div>
+</section>
+{% endblock %} 

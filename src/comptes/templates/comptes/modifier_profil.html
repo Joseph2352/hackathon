@@ -1,0 +1,85 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Modifier le profil{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Modifier votre profil</h1>
+    
+    <form method="post" enctype="multipart/form-data" class="bg-white shadow-md rounded-lg p-6">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Photo de profil -->
+            <div class="col-span-2">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="profile_picture">
+                    Photo de profil
+                </label>
+                <div class="flex items-center space-x-4">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" class="w-20 h-20 rounded-full object-cover" alt="Photo de profil actuelle">
+                    {% else %}
+                        <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center">
+                            <svg class="w-10 h-10 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="profile_picture" id="profile_picture" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                </div>
+            </div>
+
+            <!-- Prénom -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="first_name">
+                    Prénom
+                </label>
+                <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+
+            <!-- Nom -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">
+                    Nom
+                </label>
+                <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+
+            <!-- Téléphone -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="telephone">
+                    Téléphone
+                </label>
+                <input type="tel" name="telephone" id="telephone" value="{{ user.telephone }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+
+            <!-- Adresse -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="adresse">
+                    Adresse
+                </label>
+                <input type="text" name="adresse" id="adresse" value="{{ user.adresse }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+
+            <!-- Date de naissance -->
+            <div>
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="date_de_naissance">
+                    Date de naissance
+                </label>
+                <input type="date" name="date_de_naissance" id="date_de_naissance" value="{{ user.date_de_naissance|date:'Y-m-d' }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+        </div>
+
+        <!-- Boutons -->
+        <div class="flex justify-end space-x-4 mt-6">
+            <a href="{% url 'profil' %}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Annuler
+            </a>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Enregistrer les modifications
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %} 

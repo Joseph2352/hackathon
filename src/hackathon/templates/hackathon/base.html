@@ -1,0 +1,314 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}Description par défaut de votre site{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}mots-clés, professionnel, portfolio{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'images/favicon.png' %}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"}
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'hackathon/css/custom.css' %}">
+    
+    <title>{% block title %}Netface{% endblock %}</title>
+    <style>
+        .nav-link {
+            @apply text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-1 transition relative;
+        }
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+            transition: width .3s;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .glass {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px 0 rgba(31,38,135,0.15);
+        }
+        .search-anim {
+            transition: width 0.5s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s;
+            width: 160px;
+            box-shadow: 0 0 0 0 rgba(59,130,246,0);
+        }
+        .search-anim:focus {
+            width: 260px;
+            background: #f1f5f9;
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.15), 0 2px 8px 0 rgba(59,130,246,0.10);
+            animation: searchPop 0.4s;
+        }
+        @media (max-width: 768px) {
+            .search-anim { width: 100px; }
+            .search-anim:focus { width: 180px; }
+        }
+        @keyframes searchPop {
+            0% { transform: scale(0.95); }
+            60% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .animate-fadeIn { animation: fadeIn 0.7s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-slideIn { animation: slideIn 0.5s; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-bounceIn { animation: bounceIn 0.7s; }
+        @keyframes bounceIn { 0% { transform: scale(0.8); opacity: 0; } 60% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); } }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-primary-100 via-blue-50 to-indigo-100 dark:bg-gray-900">
+    <!-- Navbar -->
+    <nav class="fixed w-full glass z-50 shadow-lg animate-fadeInDown">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="flex items-center text-2xl font-extrabold text-primary-700 dark:text-primary-400 tracking-tight gap-2">
+                    <span class="bg-gradient-to-r from-primary-600 to-blue-600 p-2 rounded-full shadow-lg"><i class="fas fa-bolt text-yellow-400 animate-pulse"></i></span>
+                    <span class="ml-2">{% block logo %}netface{% endblock %}</span>
+                </a>
+                <!-- Barre de recherche animée -->
+                <form action="#" method="get" class="hidden md:flex items-center ml-8">
+                    <div class="relative">
+                        <input type="text" name="q" placeholder="Rechercher..." class="search-anim rounded-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition text-gray-700"/>
+                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary-600 hover:text-primary-800 transition">
+                            <i class="fas fa-search animate-pulse"></i>
+                        </button>
+                    </div>
+                </form>
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex items-center space-x-6 ml-8">
+                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">Accueil</a>
+                    <a href="{% url 'posts' %}" class="nav-link {% if request.resolver_match.url_name == 'posts' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">Publications</a>
+                    <a href="{% url 'map_posts' %}" class="nav-link {% if request.resolver_match.url_name == 'carte' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">Carte</a>
+                    <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">À propos</a>
+                    <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">Contact</a>
+                </div>
+                <!-- Connexion/Inscription/Profil -->
+                <div class="hidden md:flex items-center space-x-4 ml-8">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profil' %}">                        
+                            <span class="font-semibold text-primary-700 dark:text-primary-300 flex items-center gap-2 animate-fadeIn"><i class="fas fa-user-circle"></i>{{ user.username }}</span>
+                        </a>
+                        <a href="{% url 'logout' %}" class="nav-link text-red-500 hover:text-red-700 flex items-center gap-1 animate-slideIn"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link flex items-center gap-1 animate-bounceIn"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
+                    {% endif %}
+                    <button id="theme-toggle" class="ml-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-primary-100 dark:hover:bg-primary-700 transition">
+                        <i id="theme-icon" class="fas fa-moon text-gray-700 dark:text-gray-200"></i>
+                    </button>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" class="mobile-menu-button text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="mobile-menu hidden md:hidden bg-white/90 dark:bg-gray-800/90 shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <form action="#" method="get" class="flex items-center mb-2">
+                    <div class="relative w-full">
+                        <input type="text" name="q" placeholder="Rechercher..." class="search-anim rounded-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition text-gray-700 w-full"/>
+                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-primary-600 hover:text-primary-800 transition">
+                            <i class="fas fa-search animate-pulse"></i>
+                        </button>
+                    </div>
+                </form>
+                <a href="{% url 'home' %}" class="nav-link block">Accueil</a>
+                <a href="{% url 'about' %}" class="nav-link block">À propos</a>
+                <a href="{% url 'contact' %}" class="nav-link block">Contact</a>
+                {% if user.is_authenticated %}
+                    <span class="block font-semibold text-primary-700 dark:text-primary-300 my-2 animate-fadeIn"><i class="fas fa-user-circle"></i>{{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="nav-link text-red-500 hover:text-red-700 flex items-center gap-1 animate-slideIn"><i class="fas fa-sign-out-alt"></i> Se déconnecter</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link flex items-center gap-1 animate-bounceIn"><i class="fas fa-sign-in-alt"></i> Se connecter</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <style>
+        .nav-link {
+            @apply text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-2 py-1 transition relative;
+        }
+        .nav-link::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6 0%, #1e40af 100%);
+            transition: width .3s;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+
+    <!-- Main Content -->
+    <main class="pt-20 min-h-screen">
+        {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+            {% for message in messages %}
+            <div class="rounded-md p-4 mb-4 {% if message.tags == 'success' %}bg-green-100 text-green-700{% elif message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-blue-100 text-blue-700{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+      
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gradient-to-tr from-gray-900 via-gray-800 to-primary-900 text-white mt-16 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Company Info -->
+                <div class="col-span-1 md:col-span-2">
+                    <h3 class="text-2xl font-extrabold mb-4 flex items-center gap-2">
+                        <i class="fas fa-bolt mr-2 text-yellow-400 animate-pulse"></i>
+                        {% block footer_logo %}Netface{% endblock %}
+                    </h3>
+                    <p class="text-gray-300 mb-4 text-lg">{% block footer_description %}Description de votre entreprise ou service professionnel.{% endblock %}</p>
+                    <div class="flex space-x-4 mt-2">
+                        <a href="#" class="text-gray-400 hover:text-primary-400 transition-transform transform hover:scale-125"><i class="fab fa-linkedin text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary-400 transition-transform transform hover:scale-125"><i class="fab fa-twitter text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary-400 transition-transform transform hover:scale-125"><i class="fab fa-facebook text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-primary-400 transition-transform transform hover:scale-125"><i class="fab fa-instagram text-2xl"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Liens Rapides</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'home' %}" class="text-gray-400 hover:text-primary-400">Accueil</a></li>
+                        <li><a href="{% url 'about' %}" class="text-gray-400 hover:text-primary-400">À propos</a></li>
+                        <li><a href="{% url 'contact' %}" class="text-gray-400 hover:text-primary-400">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li><i class="fas fa-map-marker-alt mr-2"></i> Adresse de l'entreprise</li>
+                        <li><i class="fas fa-phone mr-2"></i> +33 1 23 45 67 89</li>
+                        <li><i class="fas fa-envelope mr-2"></i> contact@example.com</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="border-t border-gray-700 mt-5 pt-3 text-center text-gray-400">
+                <p>&copy; {% now "Y" %} {% block copyright %}Netface{% endblock %}. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-8 right-8 bg-primary-600 text-white p-3 rounded-full shadow-lg hover:bg-primary-700 transition-all duration-300 opacity-0 invisible">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Mobile Menu Toggle
+        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.toggle('hidden');
+        });
+
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.remove('opacity-0', 'invisible');
+                backToTopButton.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopButton.classList.add('opacity-0', 'invisible');
+                backToTopButton.classList.remove('opacity-100', 'visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Dark/Light mode toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            if(document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.theme = 'light';
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+        // Affichage de l'icône correcte au chargement
+        if(document.documentElement.classList.contains('dark')) {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 
