@@ -5,7 +5,7 @@ from comptes.models import CustomUser
 # Create your models here.
 
 class Post(models.Model):
-  user=models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+  user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='posts')
   title=models.CharField(max_length=200)
   description=models.TextField()
   image=models.ImageField(upload_to='posts', null=True, blank=True)
@@ -19,6 +19,8 @@ class Post(models.Model):
     ('electricite', 'Panne électrique'),
     ('dechets', 'Déchets non collectés'),
     ('environnement', 'Environnement'),
+    ('infrastructure', 'Infrastructure'),
+    ('securite', 'Sécurité'),
     ('autre', 'Autre'),
   ]
   STATUS_CHOICES = [
