@@ -12,8 +12,31 @@
         <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-auto rounded-lg">
         <p class="text-gray-600 dark:text-gray-400">Latitude: {{ post.latitude }}</p>
         <p class="text-gray-600 dark:text-gray-400">Longitude: {{ post.longitude }}</p>
-        <p class="text-gray-600 dark:text-gray-400">Nombre de votes: {{ post.nb_votes }}</p>
-        <a href="{% url 'post_vote' post.id %}" class="btn btn-primary">Voter</a>
+        <p class="text-gray-600 dark:text-gray-400">Nombre de votes: <span id="votes-count">{{ post.votes_count }}</span></p>
+        <button id="like-btn" class="btn btn-primary">
+            <i class="fas fa-thumbs-up"></i> J'aime
+        </button>
     </div>
 </div>
+<script>
+document.getElementById('like-btn').onclick = function(e) {
+    e.preventDefault();
+    fetch("{% url 'post_vote' post.id %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('votes-count').innerText = data.votes_count;
+        if(data.voted) {
+            document.getElementById('like-btn').classList.add('bg-green-500');
+        } else {
+            document.getElementById('like-btn').classList.remove('bg-green-500');
+        }
+    });
+};
+</script>
 {% endblock %}

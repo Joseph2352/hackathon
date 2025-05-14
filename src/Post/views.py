@@ -4,21 +4,22 @@ from django.db.models import Count, Avg, F, Q
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.contrib.auth.models import User
-from .models import Post
+from .models import Post, Vote
 import json
 from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from django.db.models import ExpressionWrapper, DurationField
 from .forms import PostForm
+from django.http import JsonResponse
 
 # Create your views here.
 
 def posts(request):
-  posts=Post.objects.all()
+  posts = Post.objects.all().annotate(votes_count=Count('vote'))
   return render(request, 'Post/posts.html', {'posts': posts})
 
 def post_detail(request, pk):
-  post=Post.objects.get(pk=pk)
-  return render(request, 'hackathon/post_detail.html', {'post': post})
+  post = Post.objects.annotate(votes_count=Count('vote')).get(pk=pk)
+  return render(request, 'post_detail.html', {'post': post})
 
 def post_create(request):
   if request.method == 'POST':
@@ -47,15 +48,21 @@ def post_delete(request, pk):
   return redirect('posts')
 
 def post_vote(request, pk):
-  post=Post.objects.get(pk=pk)
-  vote=Vote.objects.get(post=post, user=request.user)
-  if vote:
-    vote.delete()
-  else:
-    Vote.objects.create(post=post, user=request.user)
-  post.nb_votes=Vote.objects.filter(post=post).count()
-  post.save()
-  return redirect('hackathon/post_detail.html', pk=pk)
+    post = Post.objects.get(pk=pk)
+    user = request.user
+    voted = False
+    if request.method == 'POST':
+        try:
+            vote = Vote.objects.get(post=post, user=user)
+            vote.delete()
+            voted = False
+        except Vote.DoesNotExist:
+            Vote.objects.create(post=post, user=user)
+            voted = True
+    votes_count = Vote.objects.filter(post=post).count()
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'votes_count': votes_count, 'voted': voted})
+    return redirect('post_detail', pk=pk)
 
 @login_required
 def dashboard(request):
