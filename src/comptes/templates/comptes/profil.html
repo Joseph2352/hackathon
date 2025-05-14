@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <!-- Photo de couverture -->
+    <div class="cover-photo position-relative" style="height: 350px; background-color: #e9ecef;">
+        <img src="{% static 'images/default-cover.jpg' %}" alt="Photo de couverture" class="w-100 h-100 object-fit-cover">
+        <div class="position-absolute bottom-0 end-0 m-3">
+            <button class="btn btn-light rounded-circle">
+                <i class="fas fa-camera"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Informations du profil -->
+    <div class="container">
+        <div class="row">
+            <!-- Photo de profil et nom -->
+            <div class="col-12 position-relative" style="margin-top: -100px;">
+                <div class="d-flex align-items-end">
+                    <div class="position-relative">
+                        <img src="{% static 'images/default-profile.jpg' %}" alt="Photo de profil" 
+                             class="rounded-circle border border-4 border-white" 
+                             style="width: 168px; height: 168px; object-fit: cover;">
+                        <button class="btn btn-light rounded-circle position-absolute bottom-0 end-0">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="ms-4 mb-3">
+                        <h1 class="mb-1">{{ user.get_full_name|default:user.username }}</h1>
+                        <p class="text-muted mb-2">{{ user.profile.friends.count }} amis</p>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-user-plus me-2"></i>Modifier le profil
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation du profil -->
+            <div class="col-12 mt-3">
+                <nav class="nav nav-pills nav-fill border-bottom pb-2">
+                    <a class="nav-link active" href="#publications">Publications</a>
+                    <a class="nav-link" href="#a-propos">À propos</a>
+                    <a class="nav-link" href="#amis">Amis</a>
+                    <a class="nav-link" href="#photos">Photos</a>
+                    <a class="nav-link" href="#videos">Vidéos</a>
+                </nav>
+            </div>
+
+            <!-- Contenu principal -->
+            <div class="col-lg-4 mt-4">
+                <!-- À propos -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">À propos</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-briefcase me-2"></i>
+                                {{ user.profile.work|default:"Ajouter votre travail" }}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-graduation-cap me-2"></i>
+                                {{ user.profile.education|default:"Ajouter votre formation" }}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-home me-2"></i>
+                                {{ user.profile.location|default:"Ajouter votre ville" }}
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-heart me-2"></i>
+                                {{ user.profile.relationship_status|default:"Ajouter votre situation" }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Photos -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Photos</h5>
+                        <div class="row g-2">
+                            {% for i in "123" %}
+                            <div class="col-4">
+                                <img src="{% static 'images/default-photo.jpg' %}" alt="Photo" class="img-fluid rounded">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <a href="#" class="btn btn-link p-0 mt-2">Voir toutes les photos</a>
+                    </div>
+                </div>
+
+                <!-- Amis -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Amis</h5>
+                        <div class="row g-2">
+                            {% for i in "123456" %}
+                            <div class="col-4">
+                                <div class="text-center">
+                                    <img src="{% static 'images/default-friend.jpg' %}" alt="Ami" class="img-fluid rounded">
+                                    <small class="d-block text-truncate">Nom de l'ami</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <a href="#" class="btn btn-link p-0 mt-2">Voir tous les amis</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publications -->
+            <div class="col-lg-8 mt-4">
+                <!-- Créer une publication -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex">
+                            <img src="{% static 'images/default-profile.jpg' %}" alt="Photo de profil" 
+                                 class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                            <input type="text" class="form-control" placeholder="Quoi de neuf, {{ user.first_name }} ?">
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <button class="btn btn-light">
+                                <i class="fas fa-image text-success me-2"></i>Photo
+                            </button>
+                            <button class="btn btn-light">
+                                <i class="fas fa-video text-danger me-2"></i>Vidéo
+                            </button>
+                            <button class="btn btn-light">
+                                <i class="fas fa-smile text-warning me-2"></i>Humeur
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des publications -->
+                {% for i in "123" %}
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="d-flex mb-3">
+                            <img src="{% static 'images/default-profile.jpg' %}" alt="Photo de profil" 
+                                 class="rounded-circle me-2" style="width: 40px; height: 40px;">
+                            <div>
+                                <h6 class="mb-0">{{ user.get_full_name|default:user.username }}</h6>
+                                <small class="text-muted">Il y a 2 heures</small>
+                            </div>
+                        </div>
+                        <p class="card-text">Ceci est un exemple de publication. Vous pouvez partager vos pensées, photos et vidéos ici.</p>
+                        <img src="{% static 'images/default-post.jpg' %}" alt="Publication" class="img-fluid rounded mb-3">
+                        <div class="d-flex justify-content-between border-top border-bottom py-2 mb-3">
+                            <button class="btn btn-light">
+                                <i class="fas fa-thumbs-up me-2"></i>J'aime
+                            </button>
+                            <button class="btn btn-light">
+                                <i class="fas fa-comment me-2"></i>Commenter
+                            </button>
+                            <button class="btn btn-light">
+                                <i class="fas fa-share me-2"></i>Partager
+                            </button>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <img src="{% static 'images/default-profile.jpg' %}" alt="Photo de profil" 
+                                 class="rounded-circle me-2" style="width: 32px; height: 32px;">
+                            <input type="text" class="form-control" placeholder="Écrire un commentaire...">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .object-fit-cover {
+        object-fit: cover;
+    }
+    .nav-pills .nav-link {
+        color: #65676b;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #1877f2;
+    }
+    .btn-primary {
+        background-color: #1877f2;
+        border-color: #1877f2;
+    }
+    .btn-primary:hover {
+        background-color: #166fe5;
+        border-color: #166fe5;
+    }
+</style>
+{% endblock %} 
