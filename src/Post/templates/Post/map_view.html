@@ -1,0 +1,338 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Carte des Signalements{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Carte des Signalements</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Visualisez tous les signalements urbains sur la carte
+        </p>
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>
+                <select id="category" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="">Toutes les catégories</option>
+                    <option value="infrastructure">Infrastructure</option>
+                    <option value="securite">Sécurité</option>
+                    <option value="environnement">Environnement</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
+                <select id="status" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="">Tous les statuts</option>
+                    <option value="pending">En attente</option>
+                    <option value="in_progress">En cours</option>
+                    <option value="resolved">Résolu</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label for="date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Période</label>
+                <select id="date" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                    <option value="all">Toutes les dates</option>
+                    <option value="today">Aujourd'hui</option>
+                    <option value="week">Cette semaine</option>
+                    <option value="month">Ce mois</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carte -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <div class="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white">Signalements sur la carte</h2>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-gray-500 dark:text-gray-400">
+                    <span id="markerCount">0</span> signalements affichés
+                </span>
+                <button id="locateMe" class="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-location-arrow mr-2"></i>
+                    Ma position
+                </button>
+            </div>
+        </div>
+        <div id="map" class="w-full h-[calc(100vh-300px)] min-h-[500px]"></div>
+    </div>
+
+    <!-- Légende -->
+    <div class="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-3">Légende</h3>
+        <div class="flex flex-wrap gap-4">
+            <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-blue-500 mr-2"></div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Infrastructure</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-red-500 mr-2"></div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Sécurité</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-green-500 mr-2"></div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Environnement</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 rounded-full bg-gray-500 mr-2"></div>
+                <span class="text-sm text-gray-600 dark:text-gray-400">Autre</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation de la carte
+        const map = L.map('map').setView([48.8566, 2.3522], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Initialisation du cluster
+        const markers = L.markerClusterGroup({
+            maxClusterRadius: 50,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size = 'small';
+                if (count > 100) size = 'large';
+                else if (count > 10) size = 'medium';
+
+                return L.divIcon({
+                    html: `<div class="marker-cluster marker-cluster-${size}">
+                            <div class="marker-cluster-count">${count}</div>
+                          </div>`,
+                    className: 'marker-cluster-custom',
+                    iconSize: L.point(40, 40)
+                });
+            }
+        });
+
+        // Icônes personnalisées pour chaque catégorie
+        const icons = {
+            infrastructure: L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div class="w-4 h-4 rounded-full bg-blue-500 border-2 border-white"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            }),
+            securite: L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div class="w-4 h-4 rounded-full bg-red-500 border-2 border-white"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            }),
+            environnement: L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div class="w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            }),
+            autre: L.divIcon({
+                className: 'custom-div-icon',
+                html: '<div class="w-4 h-4 rounded-full bg-gray-500 border-2 border-white"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            })
+        };
+
+        // Données des signalements
+        const posts = {{ posts_data|safe }};
+        let currentUserMarker = null;
+        let currentMarkers = [];
+
+        // Fonction pour créer un marqueur
+        function createMarker(post) {
+            const marker = L.marker([post.latitude, post.longitude], {
+                icon: icons[post.category] || icons.autre
+            });
+
+            // Popup avec les détails
+            const popupContent = `
+                <div class="p-2">
+                    <h3 class="font-semibold text-gray-900">${post.title}</h3>
+                    <p class="text-sm text-gray-600 mb-2">${post.description}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                            ${post.category === 'infrastructure' ? 'bg-blue-100 text-blue-800' :
+                              post.category === 'securite' ? 'bg-red-100 text-red-800' :
+                              post.category === 'environnement' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'}">
+                            ${post.category}
+                        </span>
+                        <a href="/post/${post.id}" class="text-indigo-600 hover:text-indigo-800 text-sm">
+                            Voir les détails
+                        </a>
+                    </div>
+                </div>
+            `;
+            marker.bindPopup(popupContent);
+            return marker;
+        }
+
+        // Fonction pour filtrer les marqueurs
+        function filterMarkers() {
+            const category = document.getElementById('category').value;
+            const status = document.getElementById('status').value;
+            const date = document.getElementById('date').value;
+
+            // Supprimer tous les marqueurs existants
+            markers.clearLayers();
+            currentMarkers = [];
+
+            // Filtrer et ajouter les nouveaux marqueurs
+            const filteredPosts = posts.filter(post => {
+                const categoryMatch = !category || post.category === category;
+                const statusMatch = !status || post.status === status;
+                const dateMatch = !date || isWithinDateRange(post.created_at, date);
+                return categoryMatch && statusMatch && dateMatch;
+            });
+
+            filteredPosts.forEach(post => {
+                const marker = createMarker(post);
+                currentMarkers.push(marker);
+                markers.addLayer(marker);
+            });
+
+            // Mettre à jour le compteur
+            document.getElementById('markerCount').textContent = currentMarkers.length;
+
+            // Ajuster la vue si des marqueurs sont présents
+            if (currentMarkers.length > 0) {
+                const bounds = L.latLngBounds(currentMarkers.map(marker => marker.getLatLng()));
+                map.fitBounds(bounds);
+            }
+        }
+
+        // Fonction pour vérifier si une date est dans la plage sélectionnée
+        function isWithinDateRange(dateStr, range) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            switch (range) {
+                case 'today':
+                    return date >= today;
+                case 'week':
+                    return date >= weekAgo;
+                case 'month':
+                    return date >= monthAgo;
+                default:
+                    return true;
+            }
+        }
+
+        // Événements pour les filtres
+        document.getElementById('category').addEventListener('change', filterMarkers);
+        document.getElementById('status').addEventListener('change', filterMarkers);
+        document.getElementById('date').addEventListener('change', filterMarkers);
+
+        // Bouton de géolocalisation
+        document.getElementById('locateMe').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const { latitude, longitude } = position.coords;
+                        
+                        // Supprimer l'ancien marqueur de position si existant
+                        if (currentUserMarker) {
+                            map.removeLayer(currentUserMarker);
+                        }
+
+                        // Ajouter le nouveau marqueur
+                        currentUserMarker = L.marker([latitude, longitude], {
+                            icon: L.divIcon({
+                                className: 'custom-div-icon',
+                                html: '<div class="w-4 h-4 rounded-full bg-indigo-500 border-2 border-white animate-ping"></div>',
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8]
+                            })
+                        }).addTo(map);
+
+                        // Centrer la carte sur la position
+                        map.setView([latitude, longitude], 15);
+                    },
+                    error => {
+                        console.error('Erreur de géolocalisation:', error);
+                        alert('Impossible d\'obtenir votre position. Veuillez vérifier les permissions de géolocalisation.');
+                    }
+                );
+            } else {
+                alert('La géolocalisation n\'est pas supportée par votre navigateur.');
+            }
+        });
+
+        // Ajouter le groupe de clusters à la carte
+        map.addLayer(markers);
+
+        // Initialiser les marqueurs
+        filterMarkers();
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<style>
+    .custom-div-icon {
+        background: none;
+        border: none;
+    }
+    .custom-div-icon div {
+        box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+
+    /* Styles personnalisés pour les clusters */
+    .marker-cluster-custom {
+        background: none;
+    }
+    .marker-cluster {
+        background: rgba(99, 102, 241, 0.6);
+        border: 2px solid white;
+        border-radius: 50%;
+        color: white;
+        height: 40px;
+        line-height: 37px;
+        text-align: center;
+        width: 40px;
+        font-weight: bold;
+        box-shadow: 0 0 4px rgba(0,0,0,0.3);
+    }
+    .marker-cluster-small {
+        background: rgba(99, 102, 241, 0.6);
+    }
+    .marker-cluster-medium {
+        background: rgba(79, 70, 229, 0.7);
+    }
+    .marker-cluster-large {
+        background: rgba(67, 56, 202, 0.8);
+    }
+    .marker-cluster div {
+        background: none;
+        border: none;
+        box-shadow: none;
+    }
+    .marker-cluster-count {
+        font-size: 14px;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+{% endblock %} 

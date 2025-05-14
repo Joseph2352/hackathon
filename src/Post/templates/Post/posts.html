@@ -1,0 +1,142 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Signalements Urbains{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- En-tête -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Signalements Urbains</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'post_create' %}" 
+           class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <i class="fas fa-plus mr-2"></i>
+            Nouveau signalement
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filtres -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-8">
+        <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>
+                <select id="category" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="">Toutes les catégories</option>
+                    <option value="infrastructure">Infrastructure</option>
+                    <option value="securite">Sécurité</option>
+                    <option value="environnement">Environnement</option>
+                    <option value="autre">Autre</option>
+                </select>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+                <label for="sort" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Trier par</label>
+                <select id="sort" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="recent">Plus récents</option>
+                    <option value="votes">Plus de votes</option>
+                    <option value="proximite">Proximité</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des posts -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for post in posts %}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+            {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover">
+            {% endif %}
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                            <span class="text-indigo-600 font-semibold">{{ post.user.username|slice:':1'|upper }}</span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ post.user.username }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ post.created_at|date:'d M Y' }}</p>
+                        </div>
+                    </div>
+                    <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                        {% if post.category == 'infrastructure' %}bg-blue-100 text-blue-800
+                        {% elif post.category == 'securite' %}bg-red-100 text-red-800
+                        {% elif post.category == 'environnement' %}bg-green-100 text-green-800
+                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                        {{ post.get_category_display }}
+                    </span>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ post.title }}</h3>
+                <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{{ post.description }}</p>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <button class="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span>{{ post.nb_votes }}</span>
+                        </button>
+                        <button class="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
+                            <i class="fas fa-comment"></i>
+                            <span>0</span>
+                        </button>
+                    </div>
+                    <a href="{% url 'post_detail' post.id %}" 
+                       class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Voir plus
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <div class="text-gray-500 dark:text-gray-400">
+                <i class="fas fa-inbox text-4xl mb-4"></i>
+                <p class="text-lg">Aucun signalement pour le moment</p>
+                {% if user.is_authenticated %}
+                <p class="mt-2">Soyez le premier à signaler un problème !</p>
+                <a href="{% url 'post_create' %}" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-plus mr-2"></i>
+                    Créer un signalement
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if posts.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            {% if posts.has_previous %}
+            <a href="?page={{ posts.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Précédent</span>
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            {% endif %}
+
+            {% for i in posts.paginator.page_range %}
+                {% if posts.number == i %}
+                <span class="relative inline-flex items-center px-4 py-2 border border-indigo-500 bg-indigo-50 text-sm font-medium text-indigo-600">
+                    {{ i }}
+                </span>
+                {% else %}
+                <a href="?page={{ i }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                    {{ i }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if posts.has_next %}
+            <a href="?page={{ posts.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                <span class="sr-only">Suivant</span>
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

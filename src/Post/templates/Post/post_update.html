@@ -1,15 +1,205 @@
 {% extends 'hackathon/base.html' %}
 {% load static %}
 
-{% block title %}Mise à jour du post{% endblock %}
+{% block title %}Modifier le Signalement{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mise à jour du post</h1>
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Mettre à jour</button>
-    </form>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <!-- En-tête -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Modifier le Signalement</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Modifiez les informations de votre signalement urbain.
+            </p>
+        </div>
+
+        <!-- Formulaire -->
+        <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                            Des erreurs sont survenues
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Titre -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Titre du signalement
+                </label>
+                <div class="mt-1">
+                    <input type="text" name="title" id="title" required
+                           value="{{ post.title }}"
+                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                           placeholder="Ex: Nid de poule sur la rue principale">
+                </div>
+            </div>
+
+            <!-- Catégorie -->
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Catégorie
+                </label>
+                <div class="mt-1">
+                    <select name="category" id="category" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Sélectionnez une catégorie</option>
+                        <option value="infrastructure" {% if post.category == 'infrastructure' %}selected{% endif %}>Infrastructure</option>
+                        <option value="securite" {% if post.category == 'securite' %}selected{% endif %}>Sécurité</option>
+                        <option value="environnement" {% if post.category == 'environnement' %}selected{% endif %}>Environnement</option>
+                        <option value="autre" {% if post.category == 'autre' %}selected{% endif %}>Autre</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Description
+                </label>
+                <div class="mt-1">
+                    <textarea name="description" id="description" rows="4" required
+                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                              placeholder="Décrivez le problème en détail...">{{ post.description }}</textarea>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div>
+                <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Photo
+                </label>
+                {% if post.image %}
+                <div class="mt-2 mb-4">
+                    <img src="{{ post.image.url }}" alt="Image actuelle" class="h-32 w-32 object-cover rounded-lg">
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                        Image actuelle
+                    </p>
+                </div>
+                {% endif %}
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                        <i class="fas fa-camera text-gray-400 text-3xl"></i>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label for="image" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                <span>Changer la photo</span>
+                                <input id="image" name="image" type="file" class="sr-only" accept="image/*">
+                            </label>
+                            <p class="pl-1">ou glisser-déposer</p>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            PNG, JPG, GIF jusqu'à 10MB
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Localisation -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Localisation
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="latitude" class="block text-xs text-gray-500 dark:text-gray-400">Latitude</label>
+                        <input type="number" name="latitude" id="latitude" step="any" required
+                               value="{{ post.latitude }}"
+                               data-latitude="{{ post.latitude }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                               placeholder="48.8566">
+                    </div>
+                    <div>
+                        <label for="longitude" class="block text-xs text-gray-500 dark:text-gray-400">Longitude</label>
+                        <input type="number" name="longitude" id="longitude" step="any" required
+                               value="{{ post.longitude }}"
+                               data-longitude="{{ post.longitude }}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                               placeholder="2.3522">
+                    </div>
+                </div>
+                <div id="map" class="mt-2 h-64 rounded-lg border border-gray-300 dark:border-gray-600"></div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="flex justify-end space-x-4 pt-4">
+                <a href="{% url 'post_detail' post.id %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Annuler
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-save mr-2"></i>
+                    Enregistrer les modifications
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Récupération des coordonnées depuis les attributs data
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const initialLat = parseFloat(latitudeInput.dataset.latitude);
+        const initialLng = parseFloat(longitudeInput.dataset.longitude);
+
+        // Initialisation de la carte
+        const map = L.map('map').setView([initialLat, initialLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        const marker = L.marker([initialLat, initialLng], {
+            draggable: true
+        }).addTo(map);
+
+        // Mise à jour des coordonnées lors du déplacement du marqueur
+        marker.on('dragend', function(event) {
+            const position = marker.getLatLng();
+            latitudeInput.value = position.lat.toFixed(6);
+            longitudeInput.value = position.lng.toFixed(6);
+        });
+
+        // Mise à jour du marqueur lors de la saisie manuelle des coordonnées
+        latitudeInput.addEventListener('change', updateMarker);
+        longitudeInput.addEventListener('change', updateMarker);
+
+        function updateMarker() {
+            const lat = parseFloat(latitudeInput.value);
+            const lng = parseFloat(longitudeInput.value);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                marker.setLatLng([lat, lng]);
+                map.setView([lat, lng]);
+            }
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
 {% endblock %}

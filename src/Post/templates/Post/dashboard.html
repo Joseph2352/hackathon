@@ -1,0 +1,282 @@
+{% extends 'hackathon/base.html' %}
+{% load static %}
+
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- En-tête avec filtre de période -->
+    <div class="mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Tableau de Bord</h1>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                Vue d'ensemble des signalements urbains
+            </p>
+        </div>
+        <div class="flex items-center space-x-4">
+            <select id="period" class="rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                {% for period in periods %}
+                    <option value="{{ period.value }}" {% if period.value == current_period %}selected{% endif %}>
+                        {{ period.label }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total des signalements -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-indigo-100 dark:bg-indigo-900/50">
+                    <i class="fas fa-flag text-2xl text-indigo-600 dark:text-indigo-400"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Signalements</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ total_posts }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signalements ce mois -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/50">
+                    <i class="fas fa-calendar-alt text-2xl text-green-600 dark:text-green-400"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ce mois</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ posts_this_month }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signalements résolus -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/50">
+                    <i class="fas fa-check-circle text-2xl text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Résolus</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ resolved_posts }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Temps de résolution moyen -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/50">
+                    <i class="fas fa-clock text-2xl text-purple-600 dark:text-purple-400"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Temps de résolution moyen</p>
+                    <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ avg_resolution_hours }}h</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Graphique des tendances -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Tendances des Signalements</h2>
+            <canvas id="trendChart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Graphique des catégories -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Répartition par Catégorie</h2>
+            <canvas id="categoryChart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Graphique des zones -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Répartition par Zone</h2>
+            <canvas id="zoneChart" class="w-full h-64"></canvas>
+        </div>
+
+        <!-- Statistiques détaillées -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h2 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Statistiques Détaillées</h2>
+            <div class="space-y-6">
+                <!-- Par catégorie -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Par Catégorie</h3>
+                    <div class="space-y-3">
+                        {% for stat in category_stats %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 dark:text-gray-300">
+                                {{ stat.category|title }}
+                            </span>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ stat.resolved_count }}/{{ stat.count }} résolus
+                                </span>
+                                {% if stat.avg_resolution_time %}
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ stat.avg_resolution_time|default:"0"|floatformat:1 }}h
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Par zone -->
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Par Zone</h3>
+                    <div class="space-y-3">
+                        {% for stat in zone_stats %}
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600 dark:text-gray-300">
+                                {{ stat.zone }}
+                            </span>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ stat.resolved_count }}/{{ stat.count }} résolus
+                                </span>
+                                {% if stat.avg_resolution_time %}
+                                <span class="text-sm text-gray-500 dark:text-gray-400">
+                                    {{ stat.avg_resolution_time|default:"0"|floatformat:1 }}h
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configuration des couleurs
+        const colors = {
+            primary: 'rgb(99, 102, 241)',
+            success: 'rgb(16, 185, 129)',
+            danger: 'rgb(239, 68, 68)',
+            warning: 'rgb(245, 158, 11)',
+            info: 'rgb(59, 130, 246)',
+            gray: 'rgb(156, 163, 175)'
+        };
+
+        // Graphique des tendances
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: {{ trend_labels|safe }},
+                datasets: [{
+                    label: 'Nouveaux signalements',
+                    data: {{ trend_data|safe }},
+                    borderColor: colors.primary,
+                    tension: 0.1,
+                    fill: false
+                }, {
+                    label: 'Signalements résolus',
+                    data: {{ trend_resolved|safe }},
+                    borderColor: colors.success,
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Graphique des catégories
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ category_labels|safe }},
+                datasets: [{
+                    label: 'Total',
+                    data: {{ category_data|safe }},
+                    backgroundColor: colors.primary,
+                }, {
+                    label: 'Résolus',
+                    data: {{ category_resolved|safe }},
+                    backgroundColor: colors.success,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Graphique des zones
+        new Chart(document.getElementById('zoneChart'), {
+            type: 'bar',
+            data: {
+                labels: {{ zone_labels|safe }},
+                datasets: [{
+                    label: 'Total',
+                    data: {{ zone_data|safe }},
+                    backgroundColor: colors.info,
+                }, {
+                    label: 'Résolus',
+                    data: {{ zone_resolved|safe }},
+                    backgroundColor: colors.success,
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Gestion du changement de période
+        document.getElementById('period').addEventListener('change', function() {
+            window.location.href = `?period=${this.value}`;
+        });
+    });
+</script>
+{% endblock %}
+{% endblock %} 

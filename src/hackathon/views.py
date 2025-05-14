@@ -22,9 +22,6 @@ def about(request):
     }
     return render(request, 'hackathon/about.html', context)
 
-def map_posts(request):
-    posts = Post.objects.all()
-    return render(request, 'hackathon/map_posts.html', {'posts': posts})
 
 def contact(request):
     if request.method == 'POST':

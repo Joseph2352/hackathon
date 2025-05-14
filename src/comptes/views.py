@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import CustomUser, Post, Comment
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.utils import timezone
@@ -12,8 +11,14 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
-from django.contrib.auth.models import User
-from .forms import PostForm, CommentForm
+from django.contrib.auth import get_user_model
+from .models import Profile, Report, ReportComment, Notification
+from .forms import UserRegistrationForm, ReportForm, ProfileUpdateForm, UserUpdateForm
+import json
+
+from Post.models import Post
+
+User = get_user_model()
 
 # Create your views here.
 
@@ -35,13 +40,13 @@ def signup_view(request):
             messages.error(request, "Tous les champs sont obligatoires.")
         elif password1 != password2:
             messages.error(request, "Les mots de passe ne correspondent pas.")
-        elif CustomUser.objects.filter(username=username).exists():
+        elif User.objects.filter(username=username).exists():
             messages.error(request, "Ce nom d'utilisateur existe déjà.")
-        elif CustomUser.objects.filter(email=email).exists():
+        elif User.objects.filter(email=email).exists():
             messages.error(request, "Cet email est déjà utilisé.")
         else:
             # Créer l'utilisateur
-            user = CustomUser.objects.create_user(
+            user = User.objects.create_user(
                 username=username,
                 email=email,
                 first_name=first_name,
@@ -119,31 +124,25 @@ def verification_sent(request):
 
 def verify_email(request, code):
     try:
-        user = CustomUser.objects.get(verification_code=code)
+        user = User.objects.get(verification_code=code)
         if user.token_expiration and user.token_expiration > timezone.now():
             user.is_active = True
             user.verification_code = None
             user.token_expiration = None
             user.save()
+            
+            # Créer le profil associé
+            Profile.objects.create(user=user)
+            
             messages.success(request, "Votre compte a été activé avec succès ! Vous pouvez maintenant vous connecter.")
             return redirect('login')
         else:
             messages.error(request, "Le code de vérification a expiré. Veuillez demander un nouveau code.")
             return redirect('signup')
-    except CustomUser.DoesNotExist:
+    except User.DoesNotExist:
         messages.error(request, "Code de vérification invalide.")
         return redirect('signup')
 
-
-@login_required
-def profil_view(request):
-    post_form = PostForm()
-    comment_form = CommentForm()
-    context = {
-        'post_form': post_form,
-        'comment_form': comment_form,
-    }
-    return render(request, 'comptes/profil.html', context)
 
 @login_required
 def modifier_profil_view(request):
@@ -175,65 +174,133 @@ def modifier_profil_view(request):
     return render(request, 'comptes/modifier_profil.html', {'user': request.user})
 
 @login_required
-def create_post(request):
+def profile_view(request):
+    try:
+        user = request.user
+        profile = user.profile
+        
+        if request.method == 'POST':
+            user_form = UserUpdateForm(request.POST, request.FILES, instance=user)
+            profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
+            
+            if user_form.is_valid() and profile_form.is_valid():
+                user_form.save()
+                profile_form.save()
+                messages.success(request, 'Votre profil a été mis à jour avec succès !')
+                return redirect('profile')
+        else:
+            user_form = UserUpdateForm(instance=user)
+            profile_form = ProfileUpdateForm(instance=profile)
+        
+        context = {
+            'user': user,
+            'user_form': user_form,
+            'profile_form': profile_form,
+            'profile': profile,
+            'posts': user.posts.all().order_by('-created_at')[:5],
+            'notifications': Notification.objects.filter(user=user, is_read=False).order_by('-created_at')[:5]
+        }
+        return render(request, 'comptes/profile_new.html', context)
+    except Exception as e:
+        messages.error(request, f"Une erreur est survenue : {str(e)}")
+        return redirect('home')
+
+@login_required
+def create_report(request):
     if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
+        form = ReportForm(request.POST, request.FILES)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('profil')
-    return redirect('profil')
-
-@login_required
-def delete_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id, author=request.user)
-    post.delete()
-    return redirect('profil')
-
-@login_required
-def like_post(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
-    if request.user in post.likes.all():
-        post.likes.remove(request.user)
-        liked = False
+            report = form.save(commit=False)
+            report.user = request.user
+            report.save()
+            
+            # Créer une notification pour les administrateurs
+            admins = Profile.objects.filter(role='admin')
+            for admin in admins:
+                Notification.objects.create(
+                    user=admin.user,
+                    report=report,
+                    title='Nouveau signalement',
+                    message=f'Nouveau signalement créé par {request.user.username}'
+                )
+            
+            messages.success(request, 'Signalement créé avec succès !')
+            return redirect('report_detail', report_id=report.id)
     else:
-        post.likes.add(request.user)
-        liked = True
-    return JsonResponse({
-        'liked': liked,
-        'total_likes': post.total_likes()
+        form = ReportForm()
+    return render(request, 'comptes/create_report.html', {'form': form})
+
+@login_required
+def report_detail(request, report_id):
+    report = get_object_or_404(Report, id=report_id)
+    comments = report.comments.all().order_by('-created_at')
+    
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            ReportComment.objects.create(
+                report=report,
+                user=request.user,
+                content=content
+            )
+            return redirect('report_detail', report_id=report.id)
+    
+    return render(request, 'comptes/report_detail.html', {
+        'report': report,
+        'comments': comments
     })
 
 @login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, id=post_id)
+def vote_report(request, report_id):
     if request.method == 'POST':
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            comment.save()
-            return redirect('profil')
-    return redirect('profil')
+        report = get_object_or_404(Report, id=report_id)
+        if request.user in report.votes.all():
+            report.votes.remove(request.user)
+            voted = False
+        else:
+            report.votes.add(request.user)
+            voted = True
+        
+        return JsonResponse({
+            'success': True,
+            'votes': report.vote_count(),
+            'voted': voted
+        })
+    return JsonResponse({'success': False}, status=400)
 
 @login_required
-def delete_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
-    comment.delete()
-    return redirect('profil')
+def notifications(request):
+    notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
+    
+    if request.method == 'POST':
+        notification_id = request.POST.get('notification_id')
+        if notification_id:
+            notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+            notification.is_read = True
+            notification.save()
+            return JsonResponse({'success': True})
+    
+    return render(request, 'comptes/notifications.html', {
+        'notifications': notifications,
+        'unread_count': unread_count
+    })
 
 @login_required
-def like_comment(request, comment_id):
-    comment = get_object_or_404(Comment, id=comment_id)
-    if request.user in comment.likes.all():
-        comment.likes.remove(request.user)
-        liked = False
-    else:
-        comment.likes.add(request.user)
-        liked = True
-    return JsonResponse({
-        'liked': liked,
-        'total_likes': comment.total_likes()
+def dashboard(request):
+    if request.user.profile.role != 'admin':
+        messages.error(request, 'Accès non autorisé.')
+        return redirect('home')
+    
+    reports = Report.objects.all().order_by('-created_at')
+    stats = {
+        'total_reports': reports.count(),
+        'pending_reports': reports.filter(status='pending').count(),
+        'in_progress_reports': reports.filter(status='in_progress').count(),
+        'resolved_reports': reports.filter(status='resolved').count(),
+    }
+    
+    return render(request, 'comptes/dashboard.html', {
+        'reports': reports,
+        'stats': stats
     })

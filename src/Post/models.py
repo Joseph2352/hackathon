@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+from django.utils import timezone
 from comptes.models import CustomUser
 # Create your models here.
 
@@ -32,7 +34,7 @@ class Post(models.Model):
 class Vote(models.Model):
   post=models.ForeignKey(Post, on_delete=models.CASCADE)
   vote=models.BooleanField(default=True)
-  user=models.ForeignKey(CustomUser, on_delete=models.CASCADE, unique=True)
+  user=models.OneToOneField(CustomUser, on_delete=models.CASCADE)
 
   def __str__(self):
     return f"{self.user.username} voted {self.vote} for {self.post.title}"

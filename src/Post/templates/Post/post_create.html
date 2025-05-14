@@ -1,41 +1,193 @@
 {% extends 'hackathon/base.html' %}
 {% load static %}
 
-{% block title %}Ajout de post{% endblock %}
+{% block title %}Nouveau Signalement{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Ajout de post</h1>
-    <form method="post" enctype="multipart/form-data">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <!-- En-tête -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Nouveau Signalement</h1>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                Partagez un problème urbain que vous avez remarqué dans votre quartier.
+            </p>
+        </div>
+
+        <!-- Formulaire -->
+        <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="hidden" id="id_latitude" name="latitude">
-        <input type="hidden" id="id_longitude" name="longitude">
-        <button type="submit">Publier</button>
+
+            {% if form.errors %}
+            <div class="bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-md p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+                            Des erreurs sont survenues
+                        </h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                {% for field, errors in form.errors.items %}
+                                    {% for error in errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Titre -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Titre du signalement
+                </label>
+                <div class="mt-1">
+                    <input type="text" name="title" id="title" required
+                           class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                           placeholder="Ex: Nid de poule sur la rue principale">
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Donnez un titre clair et concis à votre signalement.
+                </p>
+            </div>
+
+            <!-- Catégorie -->
+            <div>
+                <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Catégorie
+                </label>
+                <div class="mt-1">
+                    <select name="category" id="category" required
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                        <option value="">Sélectionnez une catégorie</option>
+                        <option value="infrastructure">Infrastructure</option>
+                        <option value="securite">Sécurité</option>
+                        <option value="environnement">Environnement</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Description
+                </label>
+                <div class="mt-1">
+                    <textarea name="description" id="description" rows="4" required
+                              class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                              placeholder="Décrivez le problème en détail..."></textarea>
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Soyez précis dans votre description pour aider à la résolution du problème.
+                </p>
+            </div>
+
+            <!-- Image -->
+            <div>
+                <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Photo (optionnelle)
+                </label>
+                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                        <i class="fas fa-camera text-gray-400 text-3xl"></i>
+                        <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                            <label for="image" class="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                <span>Télécharger une photo</span>
+                                <input id="image" name="image" type="file" class="sr-only" accept="image/*">
+                            </label>
+                            <p class="pl-1">ou glisser-déposer</p>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                            PNG, JPG, GIF jusqu'à 10MB
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Localisation -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Localisation
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="latitude" class="block text-xs text-gray-500 dark:text-gray-400">Latitude</label>
+                        <input type="number" name="latitude" id="latitude" step="any" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                               placeholder="48.8566">
+                    </div>
+                    <div>
+                        <label for="longitude" class="block text-xs text-gray-500 dark:text-gray-400">Longitude</label>
+                        <input type="number" name="longitude" id="longitude" step="any" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                               placeholder="2.3522">
+                    </div>
+                </div>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    Utilisez la carte ci-dessous pour sélectionner l'emplacement exact.
+                </p>
+                <div id="map" class="mt-2 h-64 rounded-lg border border-gray-300 dark:border-gray-600"></div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="flex justify-end space-x-4 pt-4">
+                <a href="{% url 'posts' %}" 
+                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Annuler
+                </a>
+                <button type="submit"
+                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Publier le signalement
+                </button>
+            </div>
     </form>
+    </div>
 </div>
 
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var form = document.querySelector('form');
-    form.addEventListener('submit', function(e) {
-        var lat = document.getElementById('id_latitude').value;
-        var lng = document.getElementById('id_longitude').value;
-        if (!lat || !lng) {
-            e.preventDefault();
-            alert("La géolocalisation est obligatoire pour publier un post.");
-        }
+    // Initialisation de la carte
+    var map = L.map('map').setView([48.8566, 2.3522], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var marker = L.marker([48.8566, 2.3522], {
+        draggable: true
+    }).addTo(map);
+
+    // Mise à jour des coordonnées lors du déplacement du marqueur
+    marker.on('dragend', function(event) {
+        var position = marker.getLatLng();
+        document.getElementById('latitude').value = position.lat.toFixed(6);
+        document.getElementById('longitude').value = position.lng.toFixed(6);
     });
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-            document.getElementById('id_latitude').value = position.coords.latitude;
-            document.getElementById('id_longitude').value = position.coords.longitude;
-        }, function(error) {
-            alert("Impossible de récupérer votre position.");
-        });
-    } else {
-        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+
+    // Mise à jour du marqueur lors de la saisie manuelle des coordonnées
+    document.getElementById('latitude').addEventListener('change', updateMarker);
+    document.getElementById('longitude').addEventListener('change', updateMarker);
+
+    function updateMarker() {
+        var lat = parseFloat(document.getElementById('latitude').value);
+        var lng = parseFloat(document.getElementById('longitude').value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng]);
+        }
     }
-});
 </script>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+{% endblock %}
 {% endblock %}
