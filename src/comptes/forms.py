@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model
-from .models import Profile, Report, CustomUser
+from .models import Report, CustomUser
 
 User = get_user_model()
 
@@ -28,31 +28,6 @@ class UserRegistrationForm(UserCreationForm):
             user.save()
         return user
 
-class ProfileUpdateForm(forms.ModelForm):
-    bio = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 4}),
-        required=False,
-        max_length=500
-    )
-    location = forms.CharField(max_length=100, required=False)
-    birth_date = forms.DateField(
-        required=False,
-        widget=forms.DateInput(attrs={'type': 'date'})
-    )
-    avatar = forms.ImageField(required=False)
-
-    class Meta:
-        model = Profile
-        fields = ['bio', 'location', 'birth_date', 'avatar']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Personnalisation des labels
-        self.fields['bio'].label = 'Biographie'
-        self.fields['location'].label = 'Localisation'
-        self.fields['birth_date'].label = 'Date de naissance'
-        self.fields['avatar'].label = 'Photo de profil'
-
 class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
@@ -67,9 +42,19 @@ class ReportForm(forms.ModelForm):
         self.fields['description'].label = 'Description'
 
 class UserUpdateForm(forms.ModelForm):
+    bio = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 4}),
+        required=False,
+        max_length=500
+    )
+    location = forms.CharField(max_length=100, required=False)
+
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'email', 'telephone', 'adresse', 'date_de_naissance', 'profile_picture']
+        fields = [
+            'first_name', 'last_name', 'email', 'telephone', 'adresse',
+            'date_de_naissance', 'profile_picture', 'bio', 'location'
+        ]
         widgets = {
             'date_de_naissance': forms.DateInput(attrs={'type': 'date'}),
         }
@@ -83,4 +68,6 @@ class UserUpdateForm(forms.ModelForm):
         self.fields['telephone'].label = 'Téléphone'
         self.fields['adresse'].label = 'Adresse'
         self.fields['date_de_naissance'].label = 'Date de naissance'
-        self.fields['profile_picture'].label = 'Photo de profil' 
+        self.fields['profile_picture'].label = 'Photo de profil'
+        self.fields['bio'].label = 'Biographie'
+        self.fields['location'].label = 'Localisation' 

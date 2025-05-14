@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Avg, F, Q
+from django.db.models import Count, Avg, F, Q, Case, When, Value, CharField
 from django.utils import timezone
 from datetime import timedelta, datetime
 from django.contrib.auth.models import User
@@ -10,6 +10,7 @@ from django.db.models.functions import TruncMonth, TruncWeek, TruncDay
 from django.db.models import ExpressionWrapper, DurationField
 from .forms import PostForm
 from django.http import JsonResponse
+from django.contrib import messages
 
 # Create your views here.
 
@@ -21,15 +22,50 @@ def post_detail(request, pk):
   post = Post.objects.annotate(votes_count=Count('vote')).get(pk=pk)
   return render(request, 'Post/post_detail.html', {'post': post})
 
+@login_required
 def post_create(request):
-  if request.method == 'POST':
-    form=PostForm(request.POST, request.FILES)
-    if form.is_valid():
-      form.save()
-      return redirect('posts')
-  else:
-    form=PostForm()
-  return render(request, 'Post/post_create.html', {'form': form})
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                post = form.save(commit=False)
+                post.user = request.user
+                post.status = 'pending'  # Statut initial
+                post.created_at = timezone.now()
+                
+                # Validation des coordonnées
+                latitude = form.cleaned_data.get('latitude')
+                longitude = form.cleaned_data.get('longitude')
+                
+                if latitude is None or longitude is None:
+                    messages.error(request, 'Veuillez sélectionner une position sur la carte.')
+                    return render(request, 'Post/post_create.html', {
+                        'form': form,
+                        'user': request.user
+                    })
+                
+                # Validation des coordonnées (Paris)
+                if not (48.8 <= latitude <= 48.9) or not (2.2 <= longitude <= 2.5):
+                    messages.warning(request, 'La position sélectionnée semble être en dehors de Paris.')
+                
+                post.save()
+                messages.success(request, 'Votre signalement a été publié avec succès !')
+                return redirect('post_detail', pk=post.pk)
+            except Exception as e:
+                messages.error(request, f'Une erreur est survenue lors de la création du signalement : {str(e)}')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'Erreur dans le champ {field}: {error}')
+    else:
+        form = PostForm()
+    
+    return render(request, 'Post/post_create.html', {
+        'form': form,
+        'user': request.user,
+        'default_latitude': 48.8566,  # Coordonnées par défaut (Paris)
+        'default_longitude': 2.3522
+    })
 
 def post_update(request, pk):
   post=Post.objects.get(pk=pk)
@@ -217,8 +253,15 @@ def map_view(request):
         'category', 'status', 'created_at'
     ).order_by('-created_at')
     
+    # Convertir les dates en format string pour la sérialisation JSON
+    posts_list = []
+    for post in posts_for_map:
+        post_dict = dict(post)
+        post_dict['created_at'] = post_dict['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+        posts_list.append(post_dict)
+    
     # Convertir en JSON pour le JavaScript
-    posts_data = json.dumps(list(posts_for_map))
+    posts_data = json.dumps(posts_list)
 
     context = {
         'posts_data': posts_data,

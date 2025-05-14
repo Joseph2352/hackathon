@@ -12,8 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
 from django.contrib.auth import get_user_model
-from .models import Profile, Report, ReportComment, Notification
-from .forms import UserRegistrationForm, ReportForm, ProfileUpdateForm, UserUpdateForm
+from .models import Report, ReportComment, Notification
+from .forms import UserRegistrationForm, ReportForm, UserUpdateForm
 import json
 
 from Post.models import Post
@@ -131,9 +131,6 @@ def verify_email(request, code):
             user.token_expiration = None
             user.save()
             
-            # Créer le profil associé
-            Profile.objects.create(user=user)
-            
             messages.success(request, "Votre compte a été activé avec succès ! Vous pouvez maintenant vous connecter.")
             return redirect('login')
         else:
@@ -177,26 +174,20 @@ def modifier_profil_view(request):
 def profile_view(request):
     try:
         user = request.user
-        profile = user.profile
         
         if request.method == 'POST':
             user_form = UserUpdateForm(request.POST, request.FILES, instance=user)
-            profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=profile)
             
-            if user_form.is_valid() and profile_form.is_valid():
+            if user_form.is_valid():
                 user_form.save()
-                profile_form.save()
                 messages.success(request, 'Votre profil a été mis à jour avec succès !')
                 return redirect('profile')
         else:
             user_form = UserUpdateForm(instance=user)
-            profile_form = ProfileUpdateForm(instance=profile)
         
         context = {
             'user': user,
             'user_form': user_form,
-            'profile_form': profile_form,
-            'profile': profile,
             'posts': user.posts.all().order_by('-created_at')[:5],
             'notifications': Notification.objects.filter(user=user, is_read=False).order_by('-created_at')[:5]
         }
@@ -215,13 +206,13 @@ def create_report(request):
             report.save()
             
             # Créer une notification pour les administrateurs
-            admins = Profile.objects.filter(role='admin')
+            admins = User.objects.filter(is_staff=True)
             for admin in admins:
                 Notification.objects.create(
-                    user=admin.user,
-                    report=report,
-                    title='Nouveau signalement',
-                    message=f'Nouveau signalement créé par {request.user.username}'
+                    user=admin,
+                    type='report',
+                    message=f'Nouveau signalement créé par {request.user.username}',
+                    link=f'/reports/{report.id}/'
                 )
             
             messages.success(request, 'Signalement créé avec succès !')
@@ -288,7 +279,7 @@ def notifications(request):
 
 @login_required
 def dashboard(request):
-    if request.user.profile.role != 'admin':
+    if not request.user.is_staff:
         messages.error(request, 'Accès non autorisé.')
         return redirect('home')
     
@@ -296,7 +287,7 @@ def dashboard(request):
     stats = {
         'total_reports': reports.count(),
         'pending_reports': reports.filter(status='pending').count(),
-        'in_progress_reports': reports.filter(status='in_progress').count(),
+        'in_progress_reports': reports.filter(status='reviewing').count(),
         'resolved_reports': reports.filter(status='resolved').count(),
     }
     
