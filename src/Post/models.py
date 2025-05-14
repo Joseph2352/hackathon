@@ -18,6 +18,7 @@ class Post(models.Model):
     ('route', 'Route endommagée'),
     ('electricite', 'Panne électrique'),
     ('dechets', 'Déchets non collectés'),
+    ('environnement', 'Environnement'),
     ('autre', 'Autre'),
   ]
   STATUS_CHOICES = [
