@@ -16,7 +16,7 @@
 
         <!-- Formulaire -->
         <form method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
-            {% csrf_token %}
+        {% csrf_token %}
             
             <!-- Informations de base -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -77,18 +77,18 @@
             <!-- Champ status caché avec valeur par défaut -->
             <input type="hidden" name="status" value="attente">
 
-            <div class="flex justify-end space-x-4 pt-4">
-                <a href="{% url 'posts' %}" 
-                   class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Annuler
-                </a>
-                <button type="submit"
-                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    <i class="fas fa-paper-plane mr-2"></i>
-                    Publier le signalement
-                </button>
-            </div>
-        </form>
+        <div class="flex justify-end space-x-4 pt-4">
+            <a href="{% url 'posts' %}" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Annuler
+            </a>
+            <button type="submit"
+                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <i class="fas fa-paper-plane mr-2"></i>
+                Publier le signalement
+            </button>
+        </div>
+    </form>
     </div>
 </div>
 
@@ -104,14 +104,14 @@
         const map = L.map('map').setView([defaultLat, defaultLng], 13);
         
         // Ajouter le fond de carte
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
         // Créer et ajouter le marqueur
         const marker = L.marker([defaultLat, defaultLng], {
-            draggable: true
-        }).addTo(map);
+        draggable: true
+    }).addTo(map);
 
         // Initialiser les champs de coordonnées
         const latInput = document.getElementById('id_latitude');
@@ -120,22 +120,22 @@
         latInput.value = defaultLat.toFixed(6);
         lngInput.value = defaultLng.toFixed(6);
 
-        // Mise à jour des coordonnées lors du déplacement du marqueur
-        marker.on('dragend', function(event) {
+    // Mise à jour des coordonnées lors du déplacement du marqueur
+    marker.on('dragend', function(event) {
             const position = marker.getLatLng();
             latInput.value = position.lat.toFixed(6);
             lngInput.value = position.lng.toFixed(6);
-        });
+    });
 
-        // Mise à jour du marqueur lors de la saisie manuelle des coordonnées
-        function updateMarker() {
+    // Mise à jour du marqueur lors de la saisie manuelle des coordonnées
+    function updateMarker() {
             const lat = parseFloat(latInput.value);
             const lng = parseFloat(lngInput.value);
-            if (!isNaN(lat) && !isNaN(lng)) {
-                marker.setLatLng([lat, lng]);
-                map.setView([lat, lng]);
-            }
+        if (!isNaN(lat) && !isNaN(lng)) {
+            marker.setLatLng([lat, lng]);
+            map.setView([lat, lng]);
         }
+    }
 
         latInput.addEventListener('change', updateMarker);
         lngInput.addEventListener('change', updateMarker);

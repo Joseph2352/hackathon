@@ -116,9 +116,11 @@
                     <a href="{% url 'map_view' %}" class="nav-link {% if request.resolver_match.url_name == 'map_view' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">
                         <i class="fas fa-map-marked-alt mr-2"></i>Carte
                     </a>
+                    {% if user.is_authenticated and user.is_staff %}
                     <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">
                         <i class="fas fa-chart-line mr-2"></i>Tableau de Bord
                     </a>
+                    {% endif %}
                     <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">À propos</a>
                     <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}border-b-2 border-primary-600 dark:border-primary-400 font-bold{% endif %}">Contact</a>
                 </div>
@@ -160,9 +162,11 @@
                 <a href="{% url 'map_view' %}" class="nav-link block">
                     <i class="fas fa-map-marked-alt mr-2"></i>Carte
                 </a>
+                {% if user.is_authenticated and user.is_staff %}
                 <a href="{% url 'dashboard' %}" class="nav-link block">
                     <i class="fas fa-chart-line mr-2"></i>Tableau de Bord
                 </a>
+                {% endif %}
                 <a href="{% url 'about' %}" class="nav-link block">À propos</a>
                 <a href="{% url 'contact' %}" class="nav-link block">Contact</a>
                 {% if user.is_authenticated %}
