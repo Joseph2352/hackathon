@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .models import CustomUser
+from .models import CustomUser, Post, Comment
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.utils import timezone
@@ -11,8 +11,9 @@ from django.conf import settings
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.files.storage import FileSystemStorage
-
-from Post.models import Post
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from .forms import PostForm, CommentForm
 
 # Create your views here.
 
@@ -136,8 +137,13 @@ def verify_email(request, code):
 
 @login_required
 def profil_view(request):
-    posts = Post.objects.filter(user=request.user).order_by('-created_at')
-    return render(request, 'comptes/profil.html', {'user': request.user, 'posts': posts})
+    post_form = PostForm()
+    comment_form = CommentForm()
+    context = {
+        'post_form': post_form,
+        'comment_form': comment_form,
+    }
+    return render(request, 'comptes/profil.html', context)
 
 @login_required
 def modifier_profil_view(request):
@@ -167,3 +173,67 @@ def modifier_profil_view(request):
         return redirect('profil')
     
     return render(request, 'comptes/modifier_profil.html', {'user': request.user})
+
+@login_required
+def create_post(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('profil')
+    return redirect('profil')
+
+@login_required
+def delete_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id, author=request.user)
+    post.delete()
+    return redirect('profil')
+
+@login_required
+def like_post(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+        liked = False
+    else:
+        post.likes.add(request.user)
+        liked = True
+    return JsonResponse({
+        'liked': liked,
+        'total_likes': post.total_likes()
+    })
+
+@login_required
+def add_comment(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            comment.save()
+            return redirect('profil')
+    return redirect('profil')
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id, author=request.user)
+    comment.delete()
+    return redirect('profil')
+
+@login_required
+def like_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user in comment.likes.all():
+        comment.likes.remove(request.user)
+        liked = False
+    else:
+        comment.likes.add(request.user)
+        liked = True
+    return JsonResponse({
+        'liked': liked,
+        'total_likes': comment.total_likes()
+    })
