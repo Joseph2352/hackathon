@@ -19,7 +19,7 @@ def posts(request):
 
 def post_detail(request, pk):
   post = Post.objects.annotate(votes_count=Count('vote')).get(pk=pk)
-  return render(request, 'post_detail.html', {'post': post})
+  return render(request, 'Post/post_detail.html', {'post': post})
 
 def post_create(request):
   if request.method == 'POST':
