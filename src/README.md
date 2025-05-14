@@ -10,3 +10,16 @@ pip install -r requements.txt
 cd src
 
 python manage.py runserver
+
+
+
+
+
+
+
+
+
+connection
+
+username: hackathon
+passeword: Jose2348
